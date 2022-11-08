@@ -7,11 +7,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     //Cria o trem com seu (ID, posição X, posição Y)
-    trem1 = new Trem(1,360,300);
-    trem2 = new Trem(2,560,350);
-    trem3 = new Trem(3,230,450);
-    trem4 = new Trem(4,430,500);
-    trem5 = new Trem(5,630,450);
+    trem1 = new Trem(1,170,40);
+    trem2 = new Trem(2,370,90);
+    trem3 = new Trem(3,40,190);
+    trem4 = new Trem(4,240,240);
+    trem5 = new Trem(5,440,190);
 
     /*
      * Conecta o sinal UPDATEGUI à função UPDATEINTERFACE.
@@ -25,6 +25,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(trem3,SIGNAL(updateGUI(int,int,int)),SLOT(updateInterface(int,int,int)));
     connect(trem4,SIGNAL(updateGUI(int,int,int)),SLOT(updateInterface(int,int,int)));
     connect(trem5,SIGNAL(updateGUI(int,int,int)),SLOT(updateInterface(int,int,int)));
+
+    /*
+     * Inicia automáticamente a rotação dos trens nos trilhos.
+     */
+    trem1->start();
+    trem2->start();
+    trem3->start();
+    trem4->start();
+    trem5->start();
 
 }
 
@@ -40,10 +49,10 @@ void MainWindow::updateInterface(int id, int x, int y) {
     case 3: //Atualiza a posição do objeto da tela (quadrado) que representa o trem3
         ui->trem3->setGeometry(x,y,21,17);
         break;
-    case 4: //Atualiza a posição do objeto da tela (quadrado) que representa o trem3
+    case 4: //Atualiza a posição do objeto da tela (quadrado) que representa o trem4
         ui->trem4->setGeometry(x,y,21,17);
         break;
-    case 5: //Atualiza a posição do objeto da tela (quadrado) que representa o trem3
+    case 5: //Atualiza a posição do objeto da tela (quadrado) que representa o trem5
         ui->trem5->setGeometry(x,y,21,17);
         break;        
     default:
@@ -55,9 +64,54 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+void MainWindow::on_velocimetroT1_valueChanged(int value) {
+    trem1->set_velocidade(value);
+    if (value < 200) {
+        ui->trem1->setStyleSheet("QLabel { background: red}");
+    } else {
+        ui->trem1->setStyleSheet("QLabel { background: grey}");
+    }
+}
+
+void MainWindow::on_velocimetroT2_valueChanged(int value) {
+    trem2->set_velocidade(value);
+    if (value < 200) {
+        ui->trem2->setStyleSheet("QLabel { background: red}");
+    } else {
+        ui->trem2->setStyleSheet("QLabel { background: grey}");
+    }
+}
+
+void MainWindow::on_velocimetroT3_valueChanged(int value) {
+    trem3->set_velocidade(value);
+    if (value < 200) {
+        ui->trem3->setStyleSheet("QLabel { background: red}");
+    } else {
+        ui->trem3->setStyleSheet("QLabel { background: grey}");
+    }
+}
+
+void MainWindow::on_velocimetroT4_valueChanged(int value) {
+    trem4->set_velocidade(value);
+    if (value < 200) {
+        ui->trem4->setStyleSheet("QLabel { background: red}");
+    } else {
+        ui->trem4->setStyleSheet("QLabel { background: grey}");
+    }
+}
+
+void MainWindow::on_velocimetroT5_valueChanged(int value) {
+    trem5->set_velocidade(value);
+    if (value < 200) {
+        ui->trem5->setStyleSheet("QLabel { background: red}");
+    } else {
+        ui->trem5->setStyleSheet("QLabel { background: grey}");
+    }
+}
+
 /*
  * Ao clicar, trens começam execução
- */
+ 
 void MainWindow::on_pushButton_clicked() {
     trem1->start();
     trem2->start();
@@ -66,9 +120,8 @@ void MainWindow::on_pushButton_clicked() {
     trem5->start();
 }
 
-/*
  * Ao clicar, trens param execução
- */
+
 void MainWindow::on_pushButton_2_clicked() {
     trem1->terminate();
     trem2->terminate();
@@ -76,3 +129,4 @@ void MainWindow::on_pushButton_2_clicked() {
     trem4->terminate();
     trem5->terminate();
 }
+*/
