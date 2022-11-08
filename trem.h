@@ -18,7 +18,6 @@ public:
     void set_velocidade(int velocidade);
     int areas[6]; //controlar os estados.
     int area;
-    
 
 //Cria um sinal
 signals:

@@ -64,69 +64,28 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+/*
+ * Seta a velocidade de cada trem de acordo com a posição
+ * do QSlider. Obs.: a velocidade começa em 100 e varia 
+ * entre 0 e 200.
+ */
+
 void MainWindow::on_velocimetroT1_valueChanged(int value) {
     trem1->set_velocidade(value);
-    if (value < 200) {
-        ui->trem1->setStyleSheet("QLabel { background: red}");
-    } else {
-        ui->trem1->setStyleSheet("QLabel { background: grey}");
-    }
 }
 
 void MainWindow::on_velocimetroT2_valueChanged(int value) {
     trem2->set_velocidade(value);
-    if (value < 200) {
-        ui->trem2->setStyleSheet("QLabel { background: red}");
-    } else {
-        ui->trem2->setStyleSheet("QLabel { background: grey}");
-    }
 }
 
 void MainWindow::on_velocimetroT3_valueChanged(int value) {
     trem3->set_velocidade(value);
-    if (value < 200) {
-        ui->trem3->setStyleSheet("QLabel { background: red}");
-    } else {
-        ui->trem3->setStyleSheet("QLabel { background: grey}");
-    }
 }
 
 void MainWindow::on_velocimetroT4_valueChanged(int value) {
     trem4->set_velocidade(value);
-    if (value < 200) {
-        ui->trem4->setStyleSheet("QLabel { background: red}");
-    } else {
-        ui->trem4->setStyleSheet("QLabel { background: grey}");
-    }
 }
 
 void MainWindow::on_velocimetroT5_valueChanged(int value) {
     trem5->set_velocidade(value);
-    if (value < 200) {
-        ui->trem5->setStyleSheet("QLabel { background: red}");
-    } else {
-        ui->trem5->setStyleSheet("QLabel { background: grey}");
-    }
 }
-
-/*
- * Ao clicar, trens começam execução
- 
-void MainWindow::on_pushButton_clicked() {
-    trem1->start();
-    trem2->start();
-    trem3->start();
-    trem4->start();
-    trem5->start();
-}
-
- * Ao clicar, trens param execução
-
-void MainWindow::on_pushButton_2_clicked() {
-    trem1->terminate();
-    trem2->terminate();
-    trem3->terminate();
-    trem4->terminate();
-    trem5->terminate();
-}
-*/
