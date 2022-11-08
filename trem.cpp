@@ -41,7 +41,7 @@ Trem::Trem(int ID, int x, int y) {
 
 //Função a ser executada após executar trem->START
 void Trem::run() {
-    while(true){
+    while(true) {
 
         // Seta o nº de recursos disponíveis nos semáforos.
         this->areas[0] = area0.available();
@@ -51,7 +51,7 @@ void Trem::run() {
         this->areas[4] = conj2.available();
         this->areas[5] = geral.available();
 
-        switch(ID){
+        switch(ID) {
         case 1: //Trem 1
             if (x == 240 && y == 40) { //entrando na região 0
                 mutex_auxiliar.lock(); //Lock
@@ -64,7 +64,7 @@ void Trem::run() {
                         auxilia_teste[3] = conj2.tryAcquire(1);
 
                         if (auxilia_teste[3]) { //verifica se pode entrar no conjunto 2.
-                            auxilia_teste[4] = area1.tryAcquire(1);
+                            auxilia_teste[4] = area0.tryAcquire(1);
 
                             if (auxilia_teste[4]) { //verifica se pode entrar área 1.
                                 auxilia_teste[5] = regiao_critica[0].try_lock(); //tenta bloquear o mutex da regiao 0.
@@ -75,7 +75,7 @@ void Trem::run() {
                                     geral.release(1); //libera os recursos guardados pelo semáforo.
                                     conj1.release(1);
                                     conj2.release(1);
-                                    area1.release(1);
+                                    area0.release(1);
                                     stoped = true;
                                 }
                             } else {
@@ -100,7 +100,7 @@ void Trem::run() {
                 
             } else if (x == 240 && y == 130) { //entrando na região 2
                 mutex_auxiliar.lock(); //Lock
-                auxilia_teste[1] = area2.tryAcquire(1); //tenta adquirir recursos guardados pelo semáforo.
+                auxilia_teste[1] = area1.tryAcquire(1); //tenta adquirir recursos guardados pelo semáforo.
 
                 if (auxilia_teste[1]) { //verifica se pode entrar na área 2.
                     auxilia_teste[2] = regiao_critica[2].try_lock(); //tenta bloquear o mutex da regiao 2.
@@ -110,7 +110,7 @@ void Trem::run() {
                         area = 2;
                         stoped = false;
                     } else {
-                        area2.release(1); //libera os recursos guardados pelo semáforo.
+                        area1.release(1); //libera os recursos guardados pelo semáforo.
                         stoped = true;
                     }
                 } else {
@@ -123,7 +123,7 @@ void Trem::run() {
                 regiao_critica[2].unlock(); //Libera a região crítica 2.
                 area = 1;
                 mutex_auxiliar.lock(); //Lock
-                area1.release(1); //libera os recursos guardados pelo semáforo.
+                area0.release(1); //libera os recursos guardados pelo semáforo.
                 mutex_auxiliar.unlock(); //Unlock
 
             } else if (x == 110 && y == 140) { //saindo da região 1
@@ -132,23 +132,96 @@ void Trem::run() {
                 geral.release(1); //libera os recursos guardados pelo semáforo.
                 conj2.release(1);
                 conj1.release(1);
-                area2.release(1);
+                area1.release(1);
                 mutex_auxiliar.unlock(); //Unlock
             }
             break;
 
         case 2: //Trem 2
-            if (x < 240 && y == 40) { //Direita
-                x+=10;
-            } else if (x == 430 && y < 400) { // Baixo
-                y+=10;
-            } else if (x > 300 && y == 400) { // Esquerda
-                x-=10;
-            } else { // Cima
-                y-=10;
+            if (x == 380 && y == 130) { //entrando na região 4
+                mutex_auxiliar.lock(); //Lock
+                auxilia_teste[1] = geral.tryAcquire(1);
+
+                if (auxilia_teste[1]) {
+                    auxilia_teste[2] = conj2.tryAcquire(1);
+
+                    if (auxilia_teste[2]) {
+                        auxilia_teste[3] = area2.tryAcquire(1);
+
+                        if (auxilia_teste[3]) {
+                            auxilia_teste[4] = regiao_critica[4].try_lock();
+
+                            if (auxilia_teste[4]) {
+                                area = 4;
+                                stoped = false;
+                            } else {
+                                geral.release(1);
+                                area2.release(1);
+                                conj2.release(1);
+                                stoped = true;
+                            }
+                        } else {
+                            geral.release(1);
+                            conj2.release(1);
+                            stoped = true;
+                        }
+                    } else {
+                        geral.release(1);
+                        stoped = true;
+                    }
+                } else {
+                    stoped = true;
+                } 
+                mutex_auxiliar.unlock(); //Unlock
+            
+            } else if (x == 310 && y == 140) {//Entrando na região 3
+                mutex_auxiliar.lock();//Lock
+
+                auxilia_teste[1] = conj1.tryAcquire(1);
+                if (auxilia_teste[1]) {
+
+                    auxilia_teste[2] = area0.tryAcquire(1);
+                    if (auxilia_teste[2]) {
+
+                        auxilia_teste[3] = regiao_critica[3].try_lock();
+                        if (auxilia_teste[3]) {
+                            area=3;
+                            regiao_critica[4].unlock();
+                            stoped = false;
+                        } else {
+                            area0.release(1);
+                            conj1.release(1);
+                            stoped = true;
+                        }
+                    } else {
+                        conj1.release(1);
+                        stoped = true;
+                    }
+                } else {
+                    stoped = true;
+                }
+
+                mutex_auxiliar.unlock();//Lock
+
+            } else if (x == 240 && y == 140) {//Entrando na região 0
+                regiao_critica[0].lock();
+                area=0;
+                regiao_critica[3].unlock();
+                mutex_auxiliar.lock();
+                area2.release(1);
+                mutex_auxiliar.unlock();
+
+            } else if (x == 240 && y == 40) {//Saindo da região 0
+                regiao_critica[0].unlock();
+                mutex_auxiliar.lock();
+                geral.release(1);
+                area0.release(1);
+                conj1.release(1);
+                conj2.release(1);
+                mutex_auxiliar.unlock();
             }
-            emit updateGUI(ID,x,y);    //Emite um sinal
             break;
+
         case 3: //Trem 3
             if (x < 240 && y == 40) { //Direita
                 x+=10;
@@ -194,7 +267,7 @@ void Trem::run() {
          * junto com a variável velocidade, o trem se move 
          * nas direções correspondente a sua posição atual.
          */
-        if (stoped == false && velocidade < 200) {
+        if (stoped == false && velocidade < 200 && ID == 1) {
             if (x < 240 && y == 40) { //Direita
                 x+=10;
             } else if (x == 240 && y < 140) { // Baixo
@@ -205,12 +278,24 @@ void Trem::run() {
                 y-=10;
             }
             emit updateGUI(ID,x,y);    //Emite um sinal
+        } else if (stoped == false && velocidade < 200 && ID == 2) {
+            if (x < 380 && y == 40) { //Direita
+                x+=10;
+            } else if (x == 380 && y < 140) { // Baixo
+                y+=10;
+            } else if (x > 240 && y == 140) { // Esquerda
+                x-=10;
+            } else { // Cima
+                y-=10;
+            }
+            emit updateGUI(ID,x,y);    //Emite um sinal
         }
+
         msleep(velocidade);
 
     }
 }
 
-void Trem::set_velocidade(int velocidade){
+void Trem::set_velocidade(int velocidade) {
     this->velocidade = velocidade;
 }

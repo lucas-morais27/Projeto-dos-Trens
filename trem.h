@@ -24,8 +24,8 @@ signals:
     void updateGUI(int,int,int);
 
 private:
-    int x, x_i;      //posição X do trem na tela | posicão auxiliar do X.
-    int y, y_i;      //posição Y do trem na tela | posicão auxiliar do Y.
+    int x;      //posição X do trem na tela | posicão auxiliar do X.
+    int y;      //posição Y do trem na tela | posicão auxiliar do Y.
     int ID;          //ID do trem
     int velocidade;  //Velocidade. É o tempo de dormir em milisegundos entre a mudança de posição do trem
 };
