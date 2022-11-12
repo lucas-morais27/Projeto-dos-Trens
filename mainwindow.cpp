@@ -41,19 +41,19 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::updateInterface(int id, int x, int y) {
     switch(id){
     case 1: //Atualiza a posição do objeto da tela (quadrado) que representa o trem1
-        ui->trem1->setGeometry(x,y,21,17);
+        ui->trem1->setGeometry(x,y,20,20);
         break;
     case 2: //Atualiza a posição do objeto da tela (quadrado) que representa o trem2
-        ui->trem2->setGeometry(x,y,21,17);
+        ui->trem2->setGeometry(x,y,20,20);
         break;
     case 3: //Atualiza a posição do objeto da tela (quadrado) que representa o trem3
-        ui->trem3->setGeometry(x,y,21,17);
+        ui->trem3->setGeometry(x,y,20,20);
         break;
     case 4: //Atualiza a posição do objeto da tela (quadrado) que representa o trem4
-        ui->trem4->setGeometry(x,y,21,17);
+        ui->trem4->setGeometry(x,y,20,20);
         break;
     case 5: //Atualiza a posição do objeto da tela (quadrado) que representa o trem5
-        ui->trem5->setGeometry(x,y,21,17);
+        ui->trem5->setGeometry(x,y,20,20);
         break;        
     default:
         break;
