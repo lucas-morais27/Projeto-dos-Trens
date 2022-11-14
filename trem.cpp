@@ -38,91 +38,53 @@ static QSemaphore regiao1_2(2); // Composta pelas regiões 1 e 2.
 static QSemaphore regiao1_3(2); // Composta pelas regiões 1 e 3.
 static QSemaphore regiao_geral(2); // Composta por todas as regiões.
 
-//Construtor
+
 Trem::Trem(int ID, int x, int y) {
     this->ID = ID;
     this->x = x;
     this->y = y;
     this->velocidade = 100; 
-    this->stats = false;
+    this->parado = false;
 }
 
-//Função para setar a velocidade de cada trem de acordo com o QSlider.
 void Trem::set_velocidade(int velocidade) {
     this->velocidade = velocidade;
 }
 
-//Função a ser executada após executar trem->START
+void Trem::move(const int opcoesCoordenadas[5][4]){
+    if(!parado && velocidade < 200){
+        const int xMax = opcoesCoordenadas[ID-1][0];
+        const int yMin = opcoesCoordenadas[ID-1][1];
+        const int yMax = opcoesCoordenadas[ID-1][2];
+        const int xMin = opcoesCoordenadas[ID-1][3];
+
+        if(x < xMax && y == yMin) // DIREITA
+            x+=10;
+        else if(x == xMax && y < yMax) // BAIXO
+            y+=10;
+        else if(x > xMin && y == yMax) // ESQUERA
+            x-=10;
+        else // CIMA
+            y-=10;
+
+        emit updateGUI(ID, x, y);
+    }
+
+    msleep(velocidade);
+}
+
 void Trem::run() {
-    while(true) {
+    const int opcoesCoordenadas[5][4] = {
+        // xMax yMin yMax xMin
+          {240, 40, 140, 110},
+          {380, 40, 140, 240},
+          {170, 140, 240, 40},
+          {310, 140, 240, 170},
+          {450, 140, 240, 310}
+    };
 
-        /*
-         * De acordo com o valor da variável auxiliar stats
-         * junto com a variável velocidade, o trem se move 
-         * nas direções correspondente a sua posição atual.
-         */
-        if (stats == false && velocidade < 200 && ID == 1) {
-            if (x < 240 && y == 40) { //Direita
-                x+=10;
-            } else if (x == 240 && y < 140) { // Baixo
-                y+=10;
-            } else if (x > 110 && y == 140) { // Esquerda
-                x-=10;
-            } else { // Cima
-                y-=10;
-            }
-            emit updateGUI(ID,x,y);    //Emite um sinal
-
-        } else if (stats == false && velocidade < 200 && ID == 2) {
-            if (x < 380 && y == 40) { //Direita
-                x+=10;
-            } else if (x == 380 && y < 140) { // Baixo
-                y+=10;
-            } else if (x > 240 && y == 140) { // Esquerda
-                x-=10;
-            } else { // Cima
-                y-=10;
-            }
-            emit updateGUI(ID,x,y);    //Emite um sinal
-
-        } else if (stats == false && velocidade < 200 && ID == 3) {
-            if (x < 170 && y == 140) { //Direita
-                x+=10;
-            } else if (x == 170 && y < 240) { // Baixo
-                y+=10;
-            } else if (x > 40 && y == 240) { // Esquerda
-                x-=10;
-            } else { // Cima
-                y-=10;
-            }
-            emit updateGUI(ID,x,y);    //Emite um sinal
-
-        } else if (stats == false && velocidade < 200 && ID == 4) {
-            if (x < 310 && y == 140) { //Direita
-                x+=10;
-            } else if (x == 310 && y < 240) { // Baixo
-                y+=10;
-            } else if (x > 170 && y == 240) { // Esquerda
-                x-=10;
-            } else { // Cima
-                y-=10;
-            }
-            emit updateGUI(ID,x,y);    //Emite um sinal
-
-        } else if (stats == false && velocidade < 200 && ID == 5) {
-            if (x < 450 && y == 140) { //Direita
-                x+=10;
-            } else if (x == 450 && y < 240) { // Baixo
-                y+=10;
-            } else if (x > 310 && y == 240) { // Esquerda
-                x-=10;
-            } else { // Cima
-                y-=10;
-            }
-            emit updateGUI(ID,x,y);    //Emite um sinal
-        }
-
-        msleep(velocidade);
+    while(true){
+        this->move(opcoesCoordenadas); // Fazer trem se mover
 
         switch(ID) {
         case 1: //Trem 1
@@ -139,36 +101,36 @@ void Trem::run() {
                             if (regiao1.tryAcquire(1)) {
 
                                 if (area0.try_lock()) {
-                                    stats = false;
+                                    this->parado = false;
 
                                 } else {
                                     regiao_geral.release(1);
                                     regiao1.release(1);
                                     regiao1_2.release(1);
                                     regiao1_3.release(1);
-                                    stats = true;
+                                    this->parado = true;
                                 }
 
                             } else {
                                 regiao_geral.release(1);
                                 regiao1_3.release(1);
                                 regiao1_2.release(1);
-                                stats = true;
+                                this->parado = true;
                             }
 
                         } else {
                             regiao_geral.release(1);
                             regiao1_2.release(1);
-                            stats = true;
+                            this->parado = true;
                         }
 
                     } else {
                         regiao_geral.release(1);
-                        stats = true;
+                        this->parado = true;
                     }
 
                 } else {
-                    stats = true;
+                    this->parado = true;
                 }
 
                 mutex_auxiliar.unlock();  
@@ -181,15 +143,15 @@ void Trem::run() {
 
                     if (area2.try_lock()) {
                         area0.unlock();
-                        stats = false;
+                        this->parado = false;
 
                     } else {
                         regiao2.release(1);
-                        stats = true;
+                        this->parado = true;
                     }
 
                 } else {
-                    stats = true;
+                    this->parado = true;
                 }
 
                 mutex_auxiliar.unlock();  
@@ -233,28 +195,28 @@ void Trem::run() {
                         if (regiao3.tryAcquire(1)) {
                             
                             if (area4.try_lock()) {
-                                stats = false;
+                                this->parado = false;
 
                             } else {
                                 regiao_geral.release(1);
                                 regiao3.release(1);
                                 regiao1_3.release(1);
-                                stats = true;
+                                this->parado = true;
                             }
 
                         } else {
                             regiao_geral.release(1);
                             regiao1_3.release(1);
-                            stats = true;
+                            this->parado = true;
                         }
 
                     } else {
                         regiao_geral.release(1);
-                        stats = true;
+                        this->parado = true;
                     }
 
                 } else {
-                    stats = true;
+                    this->parado = true;
                 }
                 
                 mutex_auxiliar.unlock();    
@@ -269,21 +231,21 @@ void Trem::run() {
                         
                         if (area3.try_lock()) {
                             area4.unlock();
-                            stats = false;
+                            this->parado = false;
 
                         } else {
                             regiao1.release(1);
                             regiao1_2.release(1);
-                            stats = true;
+                            this->parado = true;
                         }
 
                     } else {
                         regiao1_2.release(1);
-                        stats = true;
+                        this->parado = true;
                     }
 
                 } else {
-                    stats = true;
+                    this->parado = true;
                 }
 
                 mutex_auxiliar.unlock(); 
@@ -328,28 +290,28 @@ void Trem::run() {
                         if (regiao2.tryAcquire(1)) {
                             
                             if (area1.try_lock()) {
-                                stats = false;
+                                this->parado = false;
 
                             } else {
                                 regiao_geral.release(1);
                                 regiao2.release(1);
                                 regiao1_2.release(1);
-                                stats = true;
+                                this->parado = true;
                             }
 
                         } else {
                             regiao_geral.release(1);
                             regiao1_2.release(1);
-                            stats = true;
+                            this->parado = true;
                         }
 
                     } else {
                         regiao_geral.release(1);
-                        stats = true;
+                        this->parado = true;
                     }
 
                 } else {
-                    stats = true;
+                    this->parado = true;
                 }
 
                 mutex_auxiliar.unlock();
@@ -387,28 +349,28 @@ void Trem::run() {
                         if (regiao2.tryAcquire(1)) {
                             
                             if (area5.try_lock()) {
-                                stats = false;
+                                this->parado = false;
 
                             } else {
                                 regiao_geral.release(1);
                                 regiao2.release(1);
                                 regiao1_2.release(1);
-                                stats = true;
+                                this->parado = true;
                             }
 
                         } else {
                             regiao_geral.release(1);
                             regiao1_2.release(1);
-                            stats = true;
+                            this->parado = true;
                         }
 
                     } else {
                         regiao_geral.release(1);
-                        stats = true;
+                        this->parado = true;
                     }
 
                 } else {
-                    stats = true;
+                    this->parado = true;
                 }
                     
                 mutex_auxiliar.unlock();
@@ -423,7 +385,7 @@ void Trem::run() {
                         
                         if (area2.try_lock()) {
                             area5.unlock();
-                            stats = false;
+                            this->parado = false;
 
                         } else {
 
@@ -431,16 +393,16 @@ void Trem::run() {
                                 regiao1_3.release(1);
                             }
                             regiao1.release(1);
-                            stats = true;
+                            this->parado = true;
                         }
 
                     } else {
                         regiao1_3.release(1);
-                        stats = true;
+                        this->parado = true;
                     }
 
                 } else {
-                    stats = true;
+                    this->parado = true;
                 }
 
                 mutex_auxiliar.unlock();
@@ -454,15 +416,15 @@ void Trem::run() {
                     if (area3.try_lock()) {
                         area2.unlock();
                         regiao2.release(1);
-                        stats = false;
+                        this->parado = false;
 
                     } else {
                         regiao3.release(1);
-                        stats = true;
+                        this->parado = true;
                     }
 
                 } else {
-                    stats = true;
+                    this->parado = true;
                 }
 
                 mutex_auxiliar.unlock();
@@ -507,28 +469,28 @@ void Trem::run() {
                         if (regiao3.tryAcquire(1)) {
                             
                             if (area6.try_lock()) {
-                                stats = false;
+                                this->parado = false;
 
                             } else {
                                 regiao_geral.release(1);
                                 regiao3.release(1);
                                 regiao1_3.release(1);
-                                stats = true;
+                                this->parado = true;
                             }
 
                         } else {
                             regiao_geral.release(1);
                             regiao1_3.release(1);
-                            stats = true;
+                            this->parado = true;
                         }
 
                     } else {
                         regiao_geral.release(1);
-                        stats = true;
+                        this->parado = true;
                     }
 
                 } else {
-                    stats = true;
+                    this->parado = true;
                 }
 
                 mutex_auxiliar.unlock();

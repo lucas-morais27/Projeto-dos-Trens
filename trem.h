@@ -12,21 +12,44 @@
 */
 class Trem: public QThread {
     Q_OBJECT
-public:
-    Trem(int,int,int);  //construtor
-    void run();         //função a ser executada pela thread
-    void set_velocidade(int velocidade);
+    public:
+        /**
+         * @brief Constrói um objeto trem
+         * @param ID - ID do trem
+         * @param x - cordenada do eixo X onde o trem inicia
+         * @param y - cordenada do eixo Y onde o trem inicia
+         */
+        Trem(int ID,int x,int y);
 
-//Cria um sinal
-signals:
-    void updateGUI(int,int,int);
+        /**
+         * @brief Atualizar a velocidade do trem
+         * @param velocidade - Nova velocidade a ser inserida no trem
+        */
+        void set_velocidade(int velocidade);
 
-private:
-    int x;      //posição X do trem na tela | posicão auxiliar do X.
-    int y;      //posição Y do trem na tela | posicão auxiliar do Y.
-    int ID;          //ID do trem
-    int velocidade;  //Velocidade. É o tempo de dormir em milisegundos entre a mudança de posição do trem
-    bool stats;      //Status do trem. True para 'parado' e False para 'em movimento'.
+
+        /**
+         * @brief Função a ser executada após executar trem->start().
+         */
+        void run();
+
+    //Cria um sinal
+    signals:
+        void updateGUI(int,int,int);
+
+    private:
+        int x;      //posição X do trem na tela | posicão auxiliar do X.
+        int y;      //posição Y do trem na tela | posicão auxiliar do Y.
+        int ID;          //ID do trem
+        int velocidade;  //Velocidade. É o tempo de dormir em milisegundos entre a mudança de posição do trem
+        bool parado;      // Armazena se o trem está parado ou não. True para 'parado' e False para 'em movimento'.
+
+        /**
+         * @brief Movimenta o trem com base no seu ID
+         *
+         * @param opcoesCoordenadas - Parâmetros das coordenadas que serão usadas para a movimentação
+         */
+        void move(const int opcoesCoordenadas[5][4]);
 };
 
 #endif // TREM_H
