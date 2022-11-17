@@ -1,2 +1,3 @@
-# sincroniza--o-e-deadlocks
- 
+# Projeto do Trens
+## Instituto Metrópole Digital
+### Sistemas Operacionais – IMD0036
