@@ -20,13 +20,11 @@ Este projeto implementa uma malha ferroviária que comporta 5 trens circulando n
 * **Controle individual:** Defina a velocidade de cada trem com barras deslizantes.
 * **Segurança aprimorada:** Evite colisões e deadlocks com regiões críticas.
 
-# Código e demonstração
+# Detalhes
 
-Acesse o código completo e a demonstração interativa no Google Drive:
+Para mais detalhes sobre o projeto acesse:
 
-```
-[Google Drive](https://drive.google.com/file/d/1Ec1AMp-uI6r523By2dK-WmQgrRTtTSc1/view?usp=sharing)
-```
+📦 [Google Drive](https://drive.google.com/file/d/1Ec1AMp-uI6r523By2dK-WmQgrRTtTSc1/view?usp=sharing)
 
 # Considerações
 
